@@ -19,12 +19,14 @@ pub const version = "0.1.0-dev";
 pub const color = @import("color.zig");
 pub const mat3 = @import("mat3.zig");
 pub const blur = @import("blur.zig");
+pub const pyramid = @import("pyramid.zig");
 
 test {
     // Aggregate tests from every source file. Add new modules here as they land.
     _ = color;
     _ = mat3;
     _ = blur;
+    _ = pyramid;
     std.testing.refAllDecls(@This());
 }
 
