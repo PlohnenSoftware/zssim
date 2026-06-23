@@ -20,6 +20,7 @@ pub const color = @import("color.zig");
 pub const mat3 = @import("mat3.zig");
 pub const blur = @import("blur.zig");
 pub const pyramid = @import("pyramid.zig");
+pub const ssim = @import("ssim.zig");
 
 test {
     // Aggregate tests from every source file. Add new modules here as they land.
@@ -27,6 +28,7 @@ test {
     _ = mat3;
     _ = blur;
     _ = pyramid;
+    _ = ssim;
     std.testing.refAllDecls(@This());
 }
 
