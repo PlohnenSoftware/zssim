@@ -2,8 +2,8 @@
 //!
 //! A clean-room, from-scratch implementation of a multi-scale, perceptually
 //! weighted structural-similarity metric (SSIM / MS-SSIM family) for comparing
-//! images. It returns an `SSIM` score in `0..1` (1 = identical) and the
-//! `distance = 1/SSIM - 1` dissimilarity in `0..∞` (0 = identical).
+//! images. It returns an `SSIM` score in `0..1` (1 = identical) and a derived
+//! perceptual `distance = 1/SSIM - 1` in `0..∞` (0 = identical, unbounded).
 //!
 //! This file is the module root: it re-exports the public API and pulls in
 //! every source file so `zig build test` exercises the whole tree.
@@ -41,6 +41,7 @@ test {
     _ = pyramid;
     _ = ssim;
     _ = compare;
+    _ = @import("properties_test.zig");
     std.testing.refAllDecls(@This());
 }
 

@@ -8,7 +8,7 @@
 //!
 //! Then `compare(a, b)` computes, per scale and channel, the cross term
 //! `blur(Iₐ·I_b)`, the mean SSIM, combines channels (luma-weighted) and scales
-//! (weighted), and returns SSIM + distance.
+//! (weighted), and returns the SSIM score plus the derived distance.
 
 const std = @import("std");
 const color = @import("color.zig");
@@ -57,7 +57,7 @@ pub const Config = struct {
 pub const Result = struct {
     /// Overall SSIM in (0,1]; 1.0 == identical.
     ssim: f64,
-    /// distance = 1/SSIM − 1 in [0,∞); 0.0 == identical.
+    /// Perceptual distance = 1/SSIM − 1 in [0,∞); 0.0 == identical, unbounded.
     distance: f64,
     /// Number of scales actually used (capped by image size).
     scales: usize,
@@ -329,7 +329,7 @@ pub const Comparator = struct {
         }
 
         const overall = ssim_acc / weight_sum;
-        return .{ .ssim = overall, .distance = ssim.todistance(overall), .scales = num };
+        return .{ .ssim = overall, .distance = ssim.toDistance(overall), .scales = num };
     }
 };
 

@@ -58,9 +58,9 @@ pub fn ssimMapChannel(mu1: []const f32, mu2: []const f32, sq1: []const f32, sq2:
     return sum / @as(f64, @floatFromInt(n));
 }
 
-/// Convert an SSIM score in (0,1] to the distance dissimilarity `1/SSIM − 1`
-/// (0 = identical, larger = more different), matching distance's value convention.
-pub fn todistance(ssim: f64) f64 {
+/// Convert an SSIM score in (0,1] to a perceptual distance `1/SSIM − 1`
+/// (0 = identical, larger = more different; unbounded).
+pub fn toDistance(ssim: f64) f64 {
     return 1.0 / @max(ssim, std.math.floatEps(f64)) - 1.0;
 }
 
@@ -77,7 +77,7 @@ test "identical moments give SSIM exactly 1" {
     const sq = [_]f32{ 0.05, 0.26, 0.66, 0.1 };
     const mean = meanSsimChannel(&mu, &mu, &sq, &sq, &sq);
     try testing.expectApproxEqAbs(@as(f64, 1.0), mean, 1e-12);
-    try testing.expectApproxEqAbs(@as(f64, 0.0), todistance(mean), 1e-12);
+    try testing.expectApproxEqAbs(@as(f64, 0.0), toDistance(mean), 1e-12);
 }
 
 test "different signals give SSIM below 1" {
@@ -88,10 +88,10 @@ test "different signals give SSIM below 1" {
     const cross = [_]f32{ 0.12, 0.05, 0.32, 0.27 };
     const mean = meanSsimChannel(&mu1, &mu2, &sq1, &sq2, &cross);
     try testing.expect(mean < 1.0);
-    try testing.expect(todistance(mean) > 0.0);
+    try testing.expect(toDistance(mean) > 0.0);
 }
 
-test "todistance is monotonic decreasing in ssim" {
-    try testing.expect(todistance(0.9) < todistance(0.5));
-    try testing.expect(todistance(0.5) < todistance(0.1));
+test "toDistance is monotonic decreasing in ssim" {
+    try testing.expect(toDistance(0.9) < toDistance(0.5));
+    try testing.expect(toDistance(0.5) < toDistance(0.1));
 }

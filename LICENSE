@@ -26,10 +26,8 @@ CLEAN-ROOM NOTICE
 
 zssim is an independent, clean-room implementation written from scratch in Zig.
 It implements image-quality algorithms described in public, peer-reviewed
-research literature (see the citations in README.md). It is NOT derived from,
-and contains no source code copied or translated from, any existing
-implementation. In particular it shares no code with an existing implementation
-(AGPL/commercial), whose source was used only to understand the well-known
-public algorithms it implements — never copied. The algorithms themselves
-(SSIM, MS-SSIM, CIE L*a*b*, ICtCp, the sRGB/PQ/HLG transfer functions) are not
-copyrightable; only specific implementations are, and this is an original one.
+research literature and open standards (see the citations in README.md). It is
+NOT derived from, and contains no source code copied or translated from, any
+existing implementation. The algorithms themselves (SSIM, MS-SSIM, CIE L*a*b*,
+ICtCp, and the sRGB/PQ/HLG transfer functions) are not copyrightable; only
+specific implementations are, and this is an original one.
