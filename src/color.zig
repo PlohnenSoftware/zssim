@@ -259,6 +259,13 @@ pub fn labNormalized(comptime p: Primaries, rgb: [3]f32) [3]f32 {
     };
 }
 
+/// Grayscale fast path: a linear gray value equals relative luminance Y for a
+/// neutral pixel, so its perceptual lightness is L* normalized to [0,1].
+pub fn grayToLNorm(y: f32) f32 {
+    const l = 116.0 * labF(@max(y, 0.0)) - 16.0;
+    return std.math.clamp(l / 100.0, 0.0, 1.0);
+}
+
 // ---------------------------------------------------------------------------
 // ICtCp (ITU-R BT.2100) — the HDR / scene-referred perceptual encoding
 // ---------------------------------------------------------------------------

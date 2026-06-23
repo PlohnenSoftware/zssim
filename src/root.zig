@@ -21,6 +21,17 @@ pub const mat3 = @import("mat3.zig");
 pub const blur = @import("blur.zig");
 pub const pyramid = @import("pyramid.zig");
 pub const ssim = @import("ssim.zig");
+pub const compare = @import("compare.zig");
+
+// --- Primary public API (re-exported for ergonomics) ------------------------
+pub const Comparator = compare.Comparator;
+pub const Config = compare.Config;
+pub const Result = compare.Result;
+pub const Space = compare.Space;
+pub const PreparedImage = compare.PreparedImage;
+pub const Transfer = compare.Transfer;
+pub const Primaries = compare.Primaries;
+pub const Encoding = compare.Encoding;
 
 test {
     // Aggregate tests from every source file. Add new modules here as they land.
@@ -29,6 +40,7 @@ test {
     _ = blur;
     _ = pyramid;
     _ = ssim;
+    _ = compare;
     std.testing.refAllDecls(@This());
 }
 
