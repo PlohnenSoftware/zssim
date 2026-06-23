@@ -15,8 +15,14 @@ const std = @import("std");
 /// Library version (keep in sync with build.zig.zon).
 pub const version = "0.1.0-dev";
 
+// --- Public submodules ------------------------------------------------------
+pub const color = @import("color.zig");
+pub const mat3 = @import("mat3.zig");
+
 test {
     // Aggregate tests from every source file. Add new modules here as they land.
+    _ = color;
+    _ = mat3;
     std.testing.refAllDecls(@This());
 }
 
