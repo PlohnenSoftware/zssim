@@ -168,11 +168,12 @@ Legend: ✅ done · 🚧 in progress · ⬜ todo
 - ✅ **Grayscale fast path** — single-channel L\* pipeline
 - ✅ **Tests** — identity = 0, symmetry, noise monotonicity, 16-bit↔8-bit
   equivalence, edge sizes (1×1, tiny), HDR/ICtCp sanity
-- ⬜ **SIMD optimization** — `@Vector` blur + SSIM combine; LUT linearization
+- 🚧 **SIMD optimization** — done: per-image LUT linearization + `@Vector`
+  blur interior. Todo: vectorize the SSIM combine
+- ✅ **ImProc integration** — vendored as a git submodule; bridge
+  (`src/imgcompare.zig`) + `improc --compare` CLI; validated on real images
 - ⬜ **Optional threading** — per-scale / per-channel parallelism via a thread pool
 - ⬜ **C ABI** — `zssim.h` + exported functions for non-Zig callers
-- ⬜ **ImProc integration** — path dependency, color-kind → space adapter, a
-  `compare` subcommand / GUI hook (also enables real-image validation)
 - ⬜ **Difference visualization** — export per-scale SSIM heatmap
 - ⬜ **Validation** — correlation check against a public IQA dataset (e.g. TID2013)
 
@@ -197,3 +198,12 @@ Legend: ✅ done · 🚧 in progress · ⬜ todo
   `blur(a·b)`), linear-light pyramid, the full preprocessing + `compare`
   pipeline, and the grayscale fast path. **32 tests passing**, including
   8-bit↔16-bit equivalence, symmetry, noise monotonicity, and HDR sanity.
+- **2026-06-23** — Optimized: per-image transfer LUT (one table vs a `pow()`
+  per pixel) and `@Vector` SIMD for the separable-blur interior (validated
+  against a scalar reference). **33 tests passing**.
+- **2026-06-23** — Integrated into ImProc as a git submodule
+  (`vendor/zssim`). Added a bridge (`ImProc/src/imgcompare.zig`) mapping
+  ImProc's decoded 16-bit RGBA `Image` to the comparator, and an
+  `improc <a> --compare <b>` CLI flag. Validated end-to-end on real images
+  (KADID-10k references, PNG/WebP round-trips): identical → distance 0,
+  distinct images → larger distance, lossless round-trip → 0.
