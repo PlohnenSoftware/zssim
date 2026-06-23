@@ -186,15 +186,18 @@ pub const Comparator = struct {
         const n = w * h;
         const maxv: f32 = @floatFromInt(std.math.maxInt(T));
 
+        // One transfer LUT per image instead of a pow() per component per pixel.
+        const lut = try buildTransferLut(sa, T, space.transfer, maxv);
+
         var lin = try sa.alloc([]f32, 3);
         for (0..3) |c| lin[c] = try sa.alloc(f32, n);
 
         for (0..n) |i| {
             const b = i * stride;
             const a: f32 = if (has_alpha) @as(f32, @floatFromInt(pixels[b + 3])) / maxv else 1.0;
-            lin[0][i] = space.transfer.decode(@as(f32, @floatFromInt(pixels[b + 0])) / maxv) * a;
-            lin[1][i] = space.transfer.decode(@as(f32, @floatFromInt(pixels[b + 1])) / maxv) * a;
-            lin[2][i] = space.transfer.decode(@as(f32, @floatFromInt(pixels[b + 2])) / maxv) * a;
+            lin[0][i] = lut[pixels[b + 0]] * a;
+            lin[1][i] = lut[pixels[b + 1]] * a;
+            lin[2][i] = lut[pixels[b + 2]] * a;
         }
 
         const enc: Encoding = if (space.scene_referred or space.transfer == .pq or space.transfer == .hlg) .ictcp else .lab;
@@ -209,11 +212,10 @@ pub const Comparator = struct {
         const n = w * h;
         const maxv: f32 = @floatFromInt(std.math.maxInt(T));
 
+        const lut = try buildTransferLut(sa, T, space.transfer, maxv);
         var lin = try sa.alloc([]f32, 1);
         lin[0] = try sa.alloc(f32, n);
-        for (0..n) |i| {
-            lin[0][i] = space.transfer.decode(@as(f32, @floatFromInt(pixels[i])) / maxv);
-        }
+        for (0..n) |i| lin[0][i] = lut[pixels[i]];
         return self.prepareCommon(&scratch, lin, w, h, space.primaries, .gray);
     }
 
@@ -332,6 +334,17 @@ pub const Comparator = struct {
         return .{ .ssim = overall, .distance = ssim.toDistance(overall), .scales = num };
     }
 };
+
+/// Build an integer→linear lookup table for a transfer function so the hot
+/// linearization loop is a table read instead of a `pow()` per component.
+/// `lut[code]` == `transfer.decode(code / maxv)`, so results are bit-identical.
+fn buildTransferLut(allocator: std.mem.Allocator, comptime T: type, transfer: Transfer, maxv: f32) Error![]f32 {
+    const lut = try allocator.alloc(f32, @as(usize, std.math.maxInt(T)) + 1);
+    for (0..lut.len) |v| {
+        lut[v] = transfer.decode(@as(f32, @floatFromInt(v)) / maxv);
+    }
+    return lut;
+}
 
 /// Fill the perceptual channel `img` planes from linear planes `cur`.
 fn encodeScale(encoding: Encoding, primaries: Primaries, cur: [][]f32, n: usize, chans: []ChannelPlanes) void {
